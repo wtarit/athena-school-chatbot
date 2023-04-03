@@ -1,5 +1,3 @@
-from json.tool import main
-import re
 from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,11 +5,15 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from genflex import *
+from dotenv import load_dotenv
+import json
+import os
+
+load_dotenv()
 
 # Use a service account
-cred = credentials.Certificate(
-    "./athena-chatbot-ee591-firebase-adminsdk-muc8c-695f14c1e7.json"
-)
+service_acc = json.loads(os.environ.get("FIREBASE_SERVICE_ACCOUNT_KEY"))
+cred = credentials.Certificate(service_acc)
 firebase_admin.initialize_app(cred)
 
 firestoredb = firestore.client()
@@ -264,6 +266,7 @@ def getdocs(userid: UserID, response: Response):
             }
         ],
     }
+
 
 @app.post("/viewgrade")
 def viewgrade(userid: UserID, response: Response):

@@ -152,5 +152,4 @@ cython_debug/
 #.idea/
 
 .vscode/
-athena-chatbot-ee591-firebase-adminsdk-muc8c-695f14c1e7.json
 .vercel
