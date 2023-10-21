@@ -1,41 +1,43 @@
-# N'Hilight chatbot
-น้องไฮไลท์ เป็นแชทบอทที่ถูกสร้างขึ้นสำหรับใช้งานในโรงเรียน สามารถใช้งานได้ทั้งบุคคลภายนอก คุณครู และนักเรียน   
+[ไทย](https://github.com/wtarit/athena-school-chatbot/blob/main/README_th.md)
+# N'Hilight chatbot   
+N'Hilight is a Line chatbot that assists students and faculty members in school. It can be used by students, teachers, and outside parties.  
 
-วีดีโอแนะนำ  
+Introductory video (Thai)  
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/hb0PVw82esA/0.jpg)](https://www.youtube.com/watch?v=hb0PVw82esA "BOTNOI Chatbot Mara-Hackathon : Athena 🤖💫")
 
-** หมายเหตุ 
+**Note**
 
-1. สามารถเข้าทดลองใช้งานได้แอดไลน์ที่ Line ID : @518fquks  
-2. สำหรับการทดสอบเข้าสู่ระบบ สามารถใช้ข้อมูลด้านล่างนี้เพื่อเข้าสู่ระบบ  
-    นักเรียน  
+1. To test the chatbot, add Line ID: @518fquks  
+2. For testing functions that require logging in, you can use the following credentials 
+    Student  
     User: 10001  
     Password: pass  
 
-    คุณครู  
+    Teacher  
     User: 10000  
     Password: password  
 
-สำหรับการเปลี่ยน Account ที่ต้องการทดลอบ สามารถพิมพ์ Logout หาบอทเพื่อทำการ Logout
-
-หมายเหตุ: แชทบอทนี้จัดทำเพื่อการแข่งขัน BOTNOI Marahackathon 2022 รอบคัดเลือก  
+To change an account, type Logout into the chatbot to Log out of an account.   
 
 ## Technical Detail 
-ตัว API นั้นเขียนด้วยภาษา Python โดยใช้ Library FastAPI และ Host บน Google App Engine (สามารถนำ API ไป Run ที่อื่นได้ตามสะดวก) ส่วน Database เราใช้ Firebase Firestore   
+The API is written in Python using FastAPI and Firebase Firestore for storing user data. Currently, the API is hosted on Vercel (Previously, it was on Google App Engine, so `app.yaml` is still included for reference in the repository).  
 
-ในการทดลอง Run  
-1. สร้าง Firebase Project, เปิดใช้งาน Firestore และ Download file service account มาไว้ใน folder เดียวกับ file code (api)
-2. แก้ชื่อ file service account ใน file main.py เป็น file ที่ download มา
-3. ติดตั้ง Library ต่าง ๆ ตาม File requirement.txt  
-4. Run ได้โดยใช้คำสั่ง  
+To run the project
+1. Create Firebase Project, enable Firestore and download the service account file.
+2. Copy content of the service account JSON file into `FIREBASE_SERVICE_ACCOUNT_KEY` in `.env` file
+3. run `pip install -r requirement.txt` to install all the dependencies  
+4. Run the server using  
 ```bash
 uvicorn main:app
 ```
-Note: หากจะนำไปใช้ผ่านตัว Chatbot โดย Run บนเครื่องอาจต้องมีการใช้ tunnel (เช่น ngrok, Cloudflare Tunnel) เพื่อให้สามารถเข้าถึงจากภายนอกได้  
+ 
+Note: To use the API through BOTNOI chatbot platform when running API on a local machine, you may need to use a tunneling service (e.g. ngrok, Cloudflare Tunnel) to make API accessible outside local network.
 
-ตัว Frontend ที่ใช้ Login นั้นเป็น Liff App ที่เรา Host โดยใช้ Github Pages แต่ว่าใช้ Custom Domain ทำให้ถ้าสังเกต URL จะไม่ใช้ github.io ซึ่งตรง url นี้จะต้องนำมาใช้ set CORS ใน file main.py โดยใส่ URL ของหน้า web login เข้าไป [(reference)](https://fastapi.tiangolo.com/tutorial/cors/)
+For the login page, we created a Liff App hosted on Github Pages. To make the backend accept requests from the login page, you must set CORS origin by putting your URL into `LOGIN_URL` in `.env` file. [(reference)](https://fastapi.tiangolo.com/tutorial/cors/)
 
-## Flow การทำงานการ Login
-ในการ Login เราใช้วิธีให้ Login ในหน้า Web ที่เป็น Liff app ซึ่งสามารถเก็บ UserID ของ Line และส่ง Message ได้  
+## How the login system work
+We used the Liff app to log users in, which can collect Line UserID and send Messages into Line chat.  
 
-ซึ่งเราจึงทำเป็น form login ในหน้า web แล้วเก็บ UserID ด้วย ถ้า Login สำเร็จ เราก็จะเก็บข้อมูล UserID ไว้ใน Database และส่ง Message "Login" เข้าไปใน Chat โดยใน Botnoi ก็จะสร้าง Intent เพื่อจับ Keyword นี้ไว้ และ Intent นี้ก็จะทำการเรียก API เพื่อ check UserID ถ้า UserID ตรงกับที่มีการลงทะเบียนไว้ก็จะ return เป็นอีก Intent หนึ่ง ที่จะใช้เปลี่ยน Rich Menu เป็น Menu สำหรับผู้ที่ Login แล้ว (เนื่องจาก API ไม่สามารถ Return object Rich Menu ได้โดยตรง เลยต้องทำผ่านอีก Intent หนึ่ง)
+1. We created a login form that collects Line UserID when users submit the form. If the user login successfully, we save the UserID into the database and send "Login" message into the chat. 
+2. In BOTNOI Platform, create an intent to check for "Login" keyword and call an API to check if the UserID is in the database.
+3. If the UserID matches, the API will return another Intent that will change the Rich Menu. (Since API can't directly return Rich Menu object, we have to do it through an intent.)

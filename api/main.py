@@ -21,7 +21,7 @@ firestoredb = firestore.client()
 app = FastAPI()
 
 origins = [
-    "https://login.teamathena.ml",
+    os.environ.get("LOGIN_URL"),
 ]
 app.add_middleware(
     CORSMiddleware,
