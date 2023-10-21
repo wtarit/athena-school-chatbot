@@ -88,7 +88,7 @@
       const loginForm = document.querySelector("#login");
       e.preventDefault();
       const profile = await liff.getProfile()
-      const loginUrl = "https://athena-school-chatbot-api-wtarit.vercel.app/login"
+      const loginUrl = "https://api.nhilight.wtarit.me/login"
 
       var data = JSON.stringify({
         "userID": profile.userId,
