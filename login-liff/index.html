@@ -88,7 +88,7 @@
       const loginForm = document.querySelector("#login");
       e.preventDefault();
       const profile = await liff.getProfile()
-      const loginUrl = "https://athena-team.et.r.appspot.com/login"
+      const loginUrl = "https://api.nhilight.wtarit.me/login"
 
       var data = JSON.stringify({
         "userID": profile.userId,
